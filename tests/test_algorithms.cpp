@@ -6,4 +6,5 @@
 TEST_CASE("edit-distance-simple") {
   CHECK_EQ(EditDistance("123", "23"), 1);
   CHECK_EQ(EditDistance("123", "225"), 2);
+  CHECK_EQ(EditDistance("123", ""), 3);
 }
