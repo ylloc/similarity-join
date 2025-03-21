@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.21)
+project(similarity_join)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+file(GLOB_RECURSE SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_library(similarity_join ${SRC_FILES})
+
+target_include_directories(similarity_join
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
+add_executable(run_tests ${TEST_SOURCES})
+
+# doctest
+target_include_directories(run_tests
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/tools/doctest
+)
+
+target_link_libraries(run_tests
+        PRIVATE
+        similarity_join
+)
+
+enable_testing()
+add_test(NAME tests COMMAND run_tests)
