@@ -1,6 +1,7 @@
-#include <algorithms/string_algorithms.h>
+#include <string_algorithms.h>
 
 #include <vector>
+#include <cstdint>
 #include <mdspan>
 
 size_t EditDistance(std::string_view s1, std::string_view s2) {
@@ -11,10 +12,10 @@ size_t EditDistance(std::string_view s1, std::string_view s2) {
 
   std::mdspan dp(buffer.data(), (n + 1), (m + 1));
 
-  for (std::size_t i = 0; i <= n; ++i) {
+  for (size_t i = 0; i <= n; ++i) {
     dp[i, 0] = i;
   }
-  for (std::size_t j = 0; j <= m; ++j) {
+  for (size_t j = 0; j <= m; ++j) {
     dp[0, j] = j;
   }
 
