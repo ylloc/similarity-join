@@ -29,6 +29,35 @@ void StringCompacter::CompactRecursive(std::string_view view, std::string &resul
     return;
   }
 
+  size_t pivot_index = FindPivotIndex(view);
+
+  result.push_back(view[pivot_index]);
+
+  CompactRecursive(view.substr(0, pivot_index), result, level - 1);
+  CompactRecursive(view.substr(pivot_index + 1), result, level - 1);
+}
+
+std::vector<size_t> StringCompacter::GetPivotPositions(std::string_view view) const {
+  std::vector<size_t> positions;
+  positions.reserve((1 << config_.compact_size) - 1);
+  GetPivotPositionsRecursive(view, 0, positions, config_.compact_size);
+  return positions;
+}
+
+void StringCompacter::GetPivotPositionsRecursive(std::string_view view, size_t base_pos, std::vector<size_t> &positions,
+                                                 size_t level) const {
+  if (level == 0 || view.empty()) {
+    return;
+  }
+
+  size_t pivot_index = FindPivotIndex(view);
+  positions.push_back(base_pos + pivot_index);
+
+  GetPivotPositionsRecursive(view.substr(0, pivot_index), base_pos, positions, level - 1);
+  GetPivotPositionsRecursive(view.substr(pivot_index + 1), base_pos + pivot_index + 1, positions, level - 1);
+}
+
+size_t StringCompacter::FindPivotIndex(std::string_view view) const {
   size_t size = view.size();
 
   auto left = static_cast<size_t>(std::ceil((0.5 - config_.epsilon) * static_cast<double>(size)));
@@ -43,10 +72,5 @@ void StringCompacter::CompactRecursive(std::string_view view, std::string &resul
     return hasher_(first) < hasher_(second);
   });
 
-  size_t pivot_index = left + std::distance(substr.begin(), pivot_it);
-
-  result.push_back(*pivot_it);
-
-  CompactRecursive(view.substr(0, pivot_index), result, level - 1);
-  CompactRecursive(view.substr(pivot_index + 1), result, level - 1);
+  return left + std::distance(substr.begin(), pivot_it);
 }

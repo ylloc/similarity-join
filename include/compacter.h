@@ -23,8 +23,15 @@ public:
 
   size_t Length() const;
 
+  std::vector<size_t> GetPivotPositions(std::string_view view) const;
+
 private:
   void CompactRecursive(std::string_view view, std::string &result, size_t level) const;
+
+  void GetPivotPositionsRecursive(std::string_view view, size_t base_pos, std::vector<size_t> &positions,
+                                  size_t level) const;
+
+  size_t FindPivotIndex(std::string_view view) const;
 
 private:
   StringCompacterConfig config_;
