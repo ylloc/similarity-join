@@ -5,11 +5,14 @@
 #include <string>
 #include <string_view>
 
+static constexpr double kDefaultEpsilon = 0.1;
+static constexpr size_t kDefaultCompactSize = 4;
+
 struct StringCompacterConfig {
   /// the interval will be [n*(0.5-eps), n*(0.5+eps)]
-  double epsilon{0.1};
+  double epsilon{kDefaultEpsilon};
   /// size compacted size will be 2^compact_size-1
-  size_t compact_size{4};
+  size_t compact_size{kDefaultCompactSize};
 };
 
 class StringCompacter {

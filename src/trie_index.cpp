@@ -25,7 +25,10 @@ void TrieIndex::InsertCompactedString(std::string sketch, std::string str) {
 
 std::vector<std::string_view> TrieIndex::Search(std::string_view query, size_t threshold) const {
   std::string sketch = compacter_.Compact(query);
-  return SearchCompactedQuery(std::move(sketch), threshold);
+  auto search_result = SearchCompactedQuery(std::move(sketch), threshold);
+  auto length_filtered_result = LengthFilter(search_result, query.size(), 0.2);
+  auto position_filtered_result = PositionFilter(length_filtered_result, query.size());
+  return position_filtered_result;
 }
 
 std::vector<std::string_view> TrieIndex::SearchCompactedQuery(std::string_view sketch, size_t threshold) const {

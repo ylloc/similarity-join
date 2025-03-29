@@ -35,6 +35,28 @@ private:
   void TrieSearch(std::string_view query, const TrieNode *node, size_t current_index, size_t alpha, size_t mark,
                   std::vector<std::string_view> &results) const;
 
+  static std::vector<std::string_view>
+  LengthFilter(const std::vector<std::string_view> &result, size_t length,
+               double length_threshold = 0.2) {
+    std::vector<std::string_view> output;
+    output.reserve(result.size());
+    for (const auto &candidate: result) {
+      size_t candidate_size = candidate.size();
+      size_t right = static_cast<size_t>((1. + length_threshold) * static_cast<double>(length));
+      size_t left = static_cast<size_t>((1. - length_threshold) * static_cast<double>(length));
+      if (candidate_size <= right && candidate_size >= left) {
+        output.push_back(candidate);
+      }
+    }
+    return output;
+  }
+
+  static std::vector<std::string_view>
+  PositionFilter(const std::vector<std::string_view> &result,
+                 double position_threshold = 0.2) {
+    // todo
+    return result;
+  }
 
 private:
   // used for short and fixed-size representation of strings in tree
