@@ -149,11 +149,10 @@ TEST_CASE("from-file") {
 
   file.close();
 
-
   size_t matches = 0;
   for (const auto& query: queries) {
-    matches += index.Search(query, 1).size() >= 1;
+    matches += static_cast<size_t>(index.Search(query, 2).size() >= 1);
   }
 
-  REQUIRE(matches >= 800);
+  REQUIRE(matches >= 900);
 }

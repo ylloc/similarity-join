@@ -4,7 +4,7 @@
 
 class Index {
 public:
-  virtual void Insert(std::string str) = 0;
+  virtual void Insert(std::string string) = 0;
 
   virtual std::vector<std::string_view> Search(std::string_view query, size_t threshold) const = 0;
 
