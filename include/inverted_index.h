@@ -16,6 +16,7 @@ struct InvertedIndexConfig {
 };
 
 struct Record {
+  std::string compacted_string;
   std::string original_str;
   size_t length;
   std::vector<size_t> pivot_positions;

@@ -2,6 +2,7 @@
 
 #include <trie_index.h>
 #include <string_algorithms.h>
+#include <inverted_index.h>
 
 #include <algorithm>
 #include <map>
@@ -146,6 +147,32 @@ TEST_CASE("from-file") {
 
     queries.push_back(line);
   }
+
+  file.close();
+
+  size_t matches = 0;
+  for (const auto& query: queries) {
+    matches += static_cast<size_t>(index.Search(query, 1).size() >= 1);
+  }
+
+  REQUIRE(matches >= 990);
+}
+
+TEST_CASE("from-file") {
+  InvertedIndex index(StringCompacterConfig{.compact_size=2});
+
+  std::ifstream file("../tests/fixtures/strings.txt");
+  REQUIRE(file.is_open());
+
+  std::vector<std::string> queries;
+
+  std::string line;
+  while (std::getline(file, line)) {
+    line[rand() % line.size()] = 'a' + (rand() % 26);
+    queries.push_back(line);
+  }
+
+  index.Build(queries);
 
   file.close();
 
