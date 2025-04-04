@@ -165,14 +165,16 @@ TEST_CASE("from-file") {
   REQUIRE(file.is_open());
 
   std::vector<std::string> queries;
+  std::vector<std::string> index_buffer;
 
   std::string line;
   while (std::getline(file, line)) {
+    index_buffer.push_back(line);
     line[rand() % line.size()] = 'a' + (rand() % 26);
     queries.push_back(line);
   }
 
-  index.Build(queries);
+  index.Build(index_buffer);
 
   file.close();
 
