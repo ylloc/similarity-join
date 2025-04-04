@@ -132,7 +132,7 @@ TEST_CASE("pivot-positions") {
 }
 
 TEST_CASE("from-file") {
-  TrieIndex index(StringCompacterConfig{.compact_size=3});
+  TrieIndex index(StringCompacterConfig{.compact_size=2});
 
   std::ifstream file("../tests/fixtures/strings.txt");
   REQUIRE(file.is_open());
@@ -151,8 +151,8 @@ TEST_CASE("from-file") {
 
   size_t matches = 0;
   for (const auto& query: queries) {
-    matches += static_cast<size_t>(index.Search(query, 2).size() >= 1);
+    matches += static_cast<size_t>(index.Search(query, 1).size() >= 1);
   }
 
-  REQUIRE(matches >= 900);
+  REQUIRE(matches >= 990);
 }
