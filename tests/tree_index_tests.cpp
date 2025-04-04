@@ -1,8 +1,12 @@
 #include <doctest.h>
 
 #include <trie_index.h>
+#include <string_algorithms.h>
 
 #include <algorithm>
+#include <map>
+#include <iostream>
+#include <fstream>
 
 TEST_CASE("simple-tests") {
   TrieIndex trie(StringCompacter{StringCompacterConfig{.compact_size=4}});
@@ -67,4 +71,89 @@ TEST_CASE("trie-hard-test") {
   SUBCASE("test-2") {
     REQUIRE_EQ(trie.SearchCompactedQuery("___", 3).size(), 7);
   }
+}
+
+TEST_CASE("pivot-positions") {
+  TrieIndex trie(StringCompacterConfig{.compact_size = 3});
+
+  constexpr size_t kBaseStrings = 100;
+  constexpr size_t kVariantsPerString = 10;
+  constexpr size_t kStringLength = 20;
+
+  std::vector<std::string> base_strings;
+  base_strings.reserve(kBaseStrings);
+
+  std::mt19937 gen(42);
+  std::uniform_int_distribution<> char_dis('a', 'z');
+  std::uniform_int_distribution<> pos_dis(0, kStringLength - 1);
+
+  auto GenerateRandomString = [&]() {
+    std::string s(kStringLength, 'a');
+    for (auto &c: s) {
+      c = static_cast<char>(char_dis(gen));
+    }
+    return s;
+  };
+
+  auto ModifyString = [&](std::string s, size_t num_edits) {
+    for (size_t i = 0; i < num_edits; ++i) {
+      size_t pos = pos_dis(gen);
+      s[pos] = static_cast<char>(char_dis(gen));
+    }
+    return s;
+  };
+
+  for (size_t i = 0; i < kBaseStrings; ++i) {
+    auto base = GenerateRandomString();
+    base_strings.push_back(base);
+
+    for (size_t j = 0; j < kVariantsPerString; ++j) {
+      auto variant = ModifyString(base, 1 + (j % 2));
+      trie.Insert(variant);
+    }
+  }
+
+  for (const auto &query: base_strings) {
+    auto found_strings = trie.Search(query, 1);
+    std::map < size_t, size_t > histogram;
+
+    for (const auto &found: found_strings) {
+      size_t dist = EditDistance(query, found);
+      histogram[dist]++;
+    }
+
+
+    // histogram
+    std::cout << "query: " << query << '\n';
+    for (const auto &[dist, count]: histogram) {
+      std::cout << "  distance: " << dist << " count: " << count << '\n';
+    }
+  }
+}
+
+TEST_CASE("from-file") {
+  TrieIndex index(StringCompacterConfig{.compact_size=3});
+
+  std::ifstream file("../tests/fixtures/strings.txt");
+  REQUIRE(file.is_open());
+
+  std::vector<std::string> queries;
+
+  std::string line;
+  while (std::getline(file, line)) {
+    index.Insert(line);
+    line[rand() % line.size()] = 'a' + (rand() % 26);
+
+    queries.push_back(line);
+  }
+
+  file.close();
+
+
+  size_t matches = 0;
+  for (const auto& query: queries) {
+    matches += index.Search(query, 1).size() >= 1;
+  }
+
+  REQUIRE(matches >= 800);
 }
