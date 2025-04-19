@@ -21,3 +21,6 @@ std::vector<int> Compact(std::string_view str, int bound) {
 
   return {};
 }
+
+class BedTree {
+};

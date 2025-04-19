@@ -4,12 +4,27 @@ project(similarity_join)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_path(STXXL_INCLUDE_DIR stxxl.h)
+find_library(STXXL_LIBRARY stxxl)
+
+if(NOT STXXL_INCLUDE_DIR OR NOT STXXL_LIBRARY)
+    message(FATAL_ERROR "STXXL not found. Please install it or set STXXL_INCLUDE_DIR and STXXL_LIBRARY manually.")
+endif()
+
+message(STATUS "Found STXXL: ${STXXL_INCLUDE_DIR}, ${STXXL_LIBRARY}")
+
 file(GLOB_RECURSE SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_library(similarity_join ${SRC_FILES})
 
 target_include_directories(similarity_join
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${STXXL_INCLUDE_DIR}
+)
+
+target_link_libraries(similarity_join
+        PUBLIC
+        ${STXXL_LIBRARY}
 )
 
 file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
